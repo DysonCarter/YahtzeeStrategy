@@ -46,4 +46,16 @@ class YahtzeeGame:
     #---------------------------------------
     #   Scoring
     #_______________________________________
+
+    def score_aces(self):
+        if self.score_sheet["aces"] is not None:
+            raise ValueError("Aces already scored")
+        
+        score = 0
+        for d in self.dice:
+            if d == 1:
+                score += 1
+
+        self.score_sheet["aces"] = score
+        return score
     
