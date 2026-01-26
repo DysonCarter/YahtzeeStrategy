@@ -25,6 +25,10 @@ class YahtzeeGame:
         # For Yahtzee Bonus
         self.yahtzee_count = 0
 
+    #---------------------------------------
+    #   Controls
+    #_______________________________________
+
     def roll_die(self):
         return random.randint(1, 6)
     
@@ -33,9 +37,13 @@ class YahtzeeGame:
             self.dice[i] = self.roll_die()
 
     # Mask len 5 of which dice to reroll
-    # indices = [1,0,0,1,0] -> reroll die 0 and die 3
-    def reroll_dice(self, indices):
-        for i, reroll in enumerate(indices):
+    # dice_mask = [1,0,0,1,0] -> reroll die 0 and die 3
+    def reroll_dice(self, dice_mask):
+        for i, reroll in enumerate(dice_mask):
             if reroll:
                 self.dice[i] = self.roll_die()
+
+    #---------------------------------------
+    #   Scoring
+    #_______________________________________
     
