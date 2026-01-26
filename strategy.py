@@ -1,5 +1,14 @@
 import random
 
+numeric_scores = {
+    "aces" :   1,
+    "twos" :   2,
+    "threes" : 3,
+    "fours" :  4,
+    "fives" :  5,
+    "sixes" :  6,
+}
+
 # Solo game
 class YahtzeeGame:
     def __init__(self):
@@ -47,15 +56,21 @@ class YahtzeeGame:
     #   Scoring
     #_______________________________________
 
-    def score_aces(self):
-        if self.score_sheet["aces"] is not None:
-            raise ValueError("Aces already scored")
+    # Score any choice from top section (1-6)
+    def score_top(self, choice):
+
+        if choice not in numeric_scores:
+            raise ValueError(f"{choice} not valid option")
         
+        if self.score_sheet[choice] is not None:
+            raise ValueError(f"{choice} already scored")
+
+        numeric_choice = numeric_scores[choice]
         score = 0
         for d in self.dice:
-            if d == 1:
-                score += 1
+            if d == numeric_choice:
+                score += numeric_choice
 
-        self.score_sheet["aces"] = score
+        self.score_sheet[choice] = score
         return score
     
