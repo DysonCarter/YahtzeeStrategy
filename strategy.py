@@ -1,28 +1,33 @@
 import random
 
-def roll_die():
-    return random.randint(1, 6)
-
 # Solo game
 class YahtzeeGame:
     def __init__(self):
-        self.dice = [0,0,0,0,0,0]
+        self.dice = [0,0,0,0,0]
 
         self.score_sheet = {
-            "aces":       0,
-            "twos":       0,
-            "threes":     0,
-            "fours":      0,
-            "fives":      0,
-            "sixes":      0,
-            "threekind":  0,
-            "fourkind":   0,
-            "fullhouse":  0,
-            "smstraight": 0,
-            "lgstraight": 0,
-            "yahtzee":    0,
-            "chance":     0,
+            "aces":       None,
+            "twos":       None,
+            "threes":     None,
+            "fours":      None,
+            "fives":      None,
+            "sixes":      None,
+            "threekind":  None,
+            "fourkind":   None,
+            "fullhouse":  None,
+            "smstraight": None,
+            "lgstraight": None,
+            "yahtzee":    None,
+            "chance":     None,
         }
 
         # For Yahtzee Bonus
         self.yahtzee_count = 0
+
+    def roll_die(self):
+        return random.randint(1, 6)
+    
+    def roll_dice(self):
+        for i in range(len(self.dice)):
+            self.dice[i] = self.roll_die()
+    
