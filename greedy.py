@@ -1,6 +1,7 @@
 from yahtzee_game import YahtzeeGame
 from itertools import product
 from functools import lru_cache
+import time
 
 class GreedyBot:
     def __init__(self):
@@ -11,7 +12,7 @@ class GreedyBot:
         return [1 if ((reroll_mask_int >> i) & 1) else 0 for i in range(5)]
 
     # Choose the best dice mask i.e. the best dice to reroll
-    def choose_best_keep(self, dice, rolls_left, score_sheet):
+    def choose_best_keep(self, dice, rolls_left, score_sheet, debug=False):
         dice_t = tuple(dice)
         avail_t = tuple(score_sheet[cat] is None for cat in self._categories)
 
@@ -59,11 +60,24 @@ class GreedyBot:
 
         best_mask = 0
         best_val = float("-inf")
+
+        if debug:
+            print(f"    [bot] evaluating 32 masks for dice={list(dice_t)} rolls_left={rolls_left}", flush=True)
+
+        t_start = time.perf_counter()
         for m in range(1 << 5):
+            if debug and (m % 4 == 0):
+                elapsed = time.perf_counter() - t_start
+                print(f"    [bot] mask {m:2d}/31 (elapsed {elapsed:.2f}s) best={best_val:.3f}", flush=True)
+
             v = ev_if_reroll_mask(dice_t, m, rolls_left)
             if v > best_val:
                 best_val = v
                 best_mask = m
+
+        if debug:
+            elapsed = time.perf_counter() - t_start
+            print(f"    [bot] done in {elapsed:.2f}s best_mask={best_mask:05b} ev={best_val:.3f}", flush=True)
 
         return best_mask
 

@@ -53,7 +53,7 @@ class YahtzeeGame:
                 self.dice[i] = self.roll_die()
 
     #---------------------------------------
-    #   Getters
+    #   Helpers
     #_______________________________________
 
     # Get Potential Scores
@@ -305,6 +305,3 @@ class YahtzeeGame:
         print("-" * 20)
         print(f"TOTAL SCORE:   {total}")
         print("="*20)
-
-Yahtzee = YahtzeeGame()
-Yahtzee.solo_menu()
