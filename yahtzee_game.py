@@ -128,8 +128,18 @@ class YahtzeeGame:
             return all_dice
 
         raise ValueError(f"Unhandled category: {choice}")
+    
+    # Gets the total score so far of aces through sixes
+    # For bonus strategy calculation
+    def get_top_total(self):
+        total = 0
+        for cat in numeric_scores:
+            if self.score_sheet[cat] is not None:
+                total += self.score_sheet[cat]
+        return total
 
     # Helper to score any choice from top section (1-6)
+    # Marks scoresheet
     def score_top(self, choice):
 
         if choice not in numeric_scores:
