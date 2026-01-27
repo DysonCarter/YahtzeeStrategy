@@ -53,7 +53,7 @@ class YahtzeeGame:
                 self.dice[i] = self.roll_die()
 
     #---------------------------------------
-    #   Scoring
+    #   Getters
     #_______________________________________
 
     # Get Potential Scores
@@ -137,6 +137,10 @@ class YahtzeeGame:
             if self.score_sheet[cat] is not None:
                 total += self.score_sheet[cat]
         return total
+    
+    #---------------------------------------
+    #   Scoring
+    #_______________________________________
 
     # Helper to score any choice from top section (1-6)
     # Marks scoresheet
