@@ -6,6 +6,10 @@ class GreedyBot:
     def __init__(self):
         self._categories = list(YahtzeeGame().score_sheet.keys())
 
+    def intmask_to_listmask(self, reroll_mask_int):
+        # bit i = 1 means reroll die i
+        return [1 if ((reroll_mask_int >> i) & 1) else 0 for i in range(5)]
+
     # Choose the best dice mask i.e. the best dice to reroll
     def choose_best_keep(self, dice, rolls_left, score_sheet):
         best_mask = 0
@@ -86,3 +90,19 @@ class GreedyBot:
             return best_category_value(dice_t)
 
         return ev_if_reroll_mask(dice_t, reroll_mask, rolls_left)
+    
+    def choose_best_category(self, dice, score_sheet):
+        """
+        When rolls_left == 0, pick the best available category for these dice.
+        """
+        g = YahtzeeGame()
+        g.dice = list(dice)
+        g.score_sheet = dict(score_sheet)  # preserve availability
+        best_cat = None
+        best_score = float("-inf")
+        for cat in self._categories:
+            s = g.get_score(cat)
+            if s > best_score:
+                best_score = s
+                best_cat = cat
+        return best_cat
