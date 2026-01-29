@@ -132,6 +132,10 @@ class DynamicProgrammingBot:
 
         t_start = time.perf_counter()
         for m in range(1 << 5):
+            if debug and (m % 4 == 0):
+                elapsed = time.perf_counter() - t_start
+                print(f"    [bot] mask {m:2d}/31 (elapsed {elapsed:.2f}s) best={best_val:.3f}", flush=True)
+                
             v = self._ev_if_reroll_mask(dice_t, m, rolls_left, avail_t, upper_total)
             if v > best_val:
                 best_val = v
