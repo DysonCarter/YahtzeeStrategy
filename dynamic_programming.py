@@ -56,6 +56,7 @@ class DynamicProgrammingBot:
         """
         Returns max(Score + FutureEV) for the current dice state.
         """
+        dice_state = tuple(sorted(dice_state))
         best = float("-inf")
         
         # We need indices to construct the next state tuple
@@ -86,6 +87,7 @@ class DynamicProgrammingBot:
 
     @lru_cache(maxsize=None)
     def _best_ev(self, dice_state, r_left, avail_t, upper_total):
+        dice_state = tuple(sorted(dice_state))
         if r_left == 0:
             return self._best_category_value(dice_state, avail_t, upper_total)
         return max(self._ev_if_reroll_mask(dice_state, m, r_left, avail_t, upper_total) for m in range(1 << 5))
@@ -104,7 +106,8 @@ class DynamicProgrammingBot:
             new_dice = list(dice_state)
             for idx, val in zip(reroll_idxs, outcome):
                 new_dice[idx] = val
-            total += p_each * self._best_ev(tuple(new_dice), r_left - 1, avail_t, upper_total)
+            new_state = tuple(sorted(new_dice)) # For canonization
+            total += p_each * self._best_ev(new_state, r_left - 1, avail_t, upper_total)
         return total
 
     def _get_upper_total(self, score_sheet):
@@ -117,7 +120,7 @@ class DynamicProgrammingBot:
 
     # Choose the best dice mask i.e. the best dice to reroll
     def choose_best_keep(self, dice, rolls_left, score_sheet, debug=False):
-        dice_t = tuple(dice)
+        dice_t = tuple(sorted(dice))
         avail_t = tuple(score_sheet[cat] is None for cat in self._categories)
         upper_total = self._get_upper_total(score_sheet)
 
@@ -148,7 +151,7 @@ class DynamicProgrammingBot:
         return best_mask
 
     def expected_turn_value(self, dice, reroll_mask, rolls_left, score_sheet):
-        dice_t = tuple(dice)
+        dice_t = tuple(sorted(dice))
         avail_t = tuple(score_sheet[cat] is None for cat in self._categories)
         upper_total = self._get_upper_total(score_sheet)
 
@@ -161,7 +164,7 @@ class DynamicProgrammingBot:
         """
         Picks the category that maximizes (Immediate Score + Future EV).
         """
-        dice_t = tuple(dice)
+        dice_t = tuple(sorted(dice))
         avail_t = tuple(score_sheet[cat] is None for cat in self._categories)
         upper_total = self._get_upper_total(score_sheet)
 

@@ -50,12 +50,14 @@ class GreedyBot:
             new_dice = list(dice_state)
             for idx, val in zip(reroll_idxs, outcome):
                 new_dice[idx] = val
-            total += p_each * self._best_ev(tuple(new_dice), r_left - 1, avail_t)
+
+            new_state = tuple(sorted(new_dice)) # Canonize
+            total += p_each * self._best_ev(new_state, r_left - 1, avail_t)
         return total
 
     # Choose the best dice mask i.e. the best dice to reroll
     def choose_best_keep(self, dice, rolls_left, score_sheet, debug=False):
-        dice_t = tuple(dice)
+        dice_t = tuple(sorted(dice))
         avail_t = tuple(score_sheet[cat] is None for cat in self._categories)
 
         # pick best mask using the *same* cache
@@ -95,7 +97,7 @@ class GreedyBot:
           - bit 1 => reroll that die
           - bit 0 => keep that die
         """
-        dice_t = tuple(dice)
+        dice_t = tuple(sorted(dice))
         avail_t = tuple(score_sheet[cat] is None for cat in self._categories)
 
         # We are evaluating the EV of taking *this specific* mask now
@@ -108,7 +110,7 @@ class GreedyBot:
         """
         When rolls_left == 0, pick the best available category for these dice.
         """
-        dice_t = tuple(dice)
+        dice_t = tuple(sorted(dice))
         avail_t = tuple(score_sheet[cat] is None for cat in self._categories)
 
         best_cat = None
