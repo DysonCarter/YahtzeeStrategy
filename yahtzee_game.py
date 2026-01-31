@@ -10,6 +10,8 @@ numeric_scores = {
     "sixes" :  6,
 }
 
+upper_by_face = {1: "aces", 2: "twos", 3: "threes", 4: "fours", 5: "fives", 6: "sixes"}
+
 # Solo game
 class YahtzeeGame:
     def __init__(self):
@@ -59,6 +61,9 @@ class YahtzeeGame:
     #   Helpers
     #_______________________________________
 
+    def _is_yahtzee(self):
+        return len(set(self.dice)) == 1
+
     # Get Potential Scores
     # -1 for invalid choices
     def get_score(self, choice):
@@ -66,6 +71,33 @@ class YahtzeeGame:
             raise ValueError(f"{choice} not valid option")
         if self.score_sheet[choice] is not None:
             raise ValueError(f"{choice} already scored")
+
+        apply_joker = self._is_yahtzee() and (self.score_sheet["yahtzee"] == 50)
+
+        if apply_joker:
+            face = self.dice[0]
+            forced_upper = upper_by_face[face]
+            upper_open = (self.score_sheet[forced_upper] is None)
+
+            lower_open_exists = any(
+                self.score_sheet[c] is None
+                for c in ("threekind", "fourkind", "fullhouse", "smstraight", "lgstraight", "yahtzee", "chance")
+            )
+
+            if upper_open and choice != forced_upper:
+                raise ValueError(f"{choice} not valid option")
+
+            if (not upper_open) and lower_open_exists and (choice in numeric_scores):
+                raise ValueError(f"{choice} not valid option")
+
+            if not upper_open:
+                if choice == "fullhouse":
+                    return 25
+                if choice == "smstraight":
+                    return 30
+                if choice == "lgstraight":
+                    return 40
+
         return calculate_score(self.dice, choice)
     
     # Gets the total score so far of aces through sixes
@@ -83,80 +115,12 @@ class YahtzeeGame:
     
     # Mark any choice on scoresheet
     def score(self, choice):
+        bonus_awarded = self._is_yahtzee() and (self.score_sheet["yahtzee"] == 50)
+
         points = self.get_score(choice)
         self.score_sheet[choice] = points
+
+        if bonus_awarded:
+            self.yahtzee_count += 1
+
         return points
-    
-    #---------------------------------------
-    #   Menu
-    #_______________________________________
-
-    def solo_menu(self):
-        print("--- Welcome to Solo Yahtzee ---")
-        
-        # A standard game has 13 rounds to fill the 13 categories
-        for turn in range(1, 14):
-            print(f"\nTurn {turn} of 13")
-            self.roll_dice()
-            
-            # Up to 2 rerolls allowed (3 rolls total)
-            for r in range(2):
-                print(f"Current Dice: {self.dice}")
-                print("Enter die positions to REROLL (1-5) separated by commas (e.g., 1,2,5), or 'k' to keep:")
-                user_input = input("> ").strip().lower()
-                
-                if user_input == 'k':
-                    break
-                
-                # Convert user input (1-5) into the [1,0,0,1,0] mask your function expects
-                mask = [0, 0, 0, 0, 0]
-                try:
-                    # Subtract 1 because users think 1-5, but indices are 0-4
-                    indices = [int(i.strip()) - 1 for i in user_input.split(',')]
-                    for idx in indices:
-                        if 0 <= idx < 5:
-                            mask[idx] = 1
-                    self.reroll_dice(mask)
-                except ValueError:
-                    print("Invalid input. Keeping current dice.")
-                    break
-
-            print(f"Final Dice for this turn: {self.dice}")
-            
-            # Show available scoring options
-            available = [cat for cat, val in self.score_sheet.items() if val is None]
-            print(f"Available Categories: {', '.join(available)}")
-            
-            while True:
-                choice = input("Select category to score: ").strip().lower()
-                try:
-                    # Handle Yahtzee Bonus logic before scoring
-                    # (If it's a Yahtzee and the slot is already filled with 50)
-                    if len(set(self.dice)) == 1 and self.score_sheet["yahtzee"] == 50:
-                        self.yahtzee_count += 1
-                        print("Yahtzee Bonus! +100 points added.")
-
-                    points = self.score(choice)
-                    print(f"Scored {points} points in {choice}!")
-                    break
-                except ValueError as e:
-                    print(f"Error: {e}. Please try again.")
-
-        # Final Scoring Calculation
-        upper_score = sum(self.score_sheet[cat] for cat in numeric_scores)
-        upper_bonus = 35 if upper_score >= 63 else 0
-        lower_score = sum(val for cat, val in self.score_sheet.items() if cat not in numeric_scores)
-        bonus_points = self.yahtzee_count * 100
-        
-        total = upper_score + upper_bonus + lower_score + bonus_points
-
-        print("\n" + "="*20)
-        print("      GAME OVER      ")
-        print("="*20)
-        print(f"Upper Section: {upper_score}")
-        if upper_bonus: print(f"Upper Bonus:   {upper_bonus}")
-        print(f"Lower Section: {lower_score}")
-        if bonus_points: print(f"Yahtzee Bonus: {bonus_points}")
-        print("-" * 20)
-        print(f"TOTAL SCORE:   {total}")
-        print("="*20)
