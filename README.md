@@ -54,6 +54,7 @@ Perfectly Optimized - Maximized Expected Value
 * Does **not** reason about future turns or category scarcity
 
 Very strong, but some small flaws (e.g. greedy will never sacrifice a small category for the chance at a huge future turn)
+
 ---
 
 ### 3. MLBot (`ml.py`)
